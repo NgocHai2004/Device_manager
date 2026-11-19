@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 
 interface Moon {
   lit: boolean
+  color?: string
 }
 
 interface PlanetProps {
@@ -40,29 +41,32 @@ export default function Planet({ color, size = 96, moons = [] }: PlanetProps) {
         }}
       />
       {/* moons */}
-      {moons.map((m, i) => (
-        <span
-          key={i}
-          className="moon rounded-full"
-          style={
-            {
-              '--r': `${ringR}px`,
-              animationDuration: `${6 + i * 1.7}s`,
-              animationDelay: `${-i * 2.2}s`,
-              width: size * 0.14,
-              height: size * 0.14,
-              margin: -(size * 0.14) / 2,
-              background: m.lit
-                ? 'radial-gradient(circle at 30% 30%, #fff, #f6f3ff 40%, #c9c2ff)'
-                : 'radial-gradient(circle at 30% 30%, #8b8799, #3a3745)',
-              boxShadow: m.lit
-                ? `0 0 8px #cfc8ff, 0 0 16px ${color}88`
-                : 'inset -2px -2px 4px #00000066',
-              opacity: m.lit ? 1 : 0.55,
-            } as CSSProperties
-          }
-        />
-      ))}
+      {moons.map((m, i) => {
+        const mColor = m.color || color
+        return (
+          <span
+            key={i}
+            className="moon rounded-full"
+            style={
+              {
+                '--r': `${ringR}px`,
+                animationDuration: `${6 + i * 1.7}s`,
+                animationDelay: `${-i * 2.2}s`,
+                width: size * 0.14,
+                height: size * 0.14,
+                margin: -(size * 0.14) / 2,
+                background: m.lit
+                  ? `radial-gradient(circle at 30% 30%, #ffffff, ${mColor} 70%)`
+                  : 'radial-gradient(circle at 30% 30%, #8b8799, #3a3745)',
+                boxShadow: m.lit
+                  ? `0 0 10px #ffffff, 0 0 18px ${mColor}, 0 0 28px ${mColor}`
+                  : 'inset -2px -2px 4px #00000066',
+                opacity: m.lit ? 1 : 0.45,
+              } as CSSProperties
+            }
+          />
+        )
+      })}
     </div>
   )
 }

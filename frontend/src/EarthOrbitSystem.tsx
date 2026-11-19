@@ -15,6 +15,7 @@ export interface EpicPlanet {
     id: string | number
     name: string
     lit: boolean
+    color?: string
   }[]
 }
 
@@ -109,6 +110,7 @@ export default function EarthOrbitSystem({
         my,
         layer,
         moonBehind,
+        color: m.color || p.color,
       }
     })
 
@@ -161,27 +163,68 @@ export default function EarthOrbitSystem({
         ))}
 
         {/* Moons behind planet */}
-        {moonsBehind.map((m, mIdx) => (
-          <g key={m.id || mIdx}>
-            {m.lit && (
-              <circle
-                cx={m.mx}
-                cy={m.my}
-                r={4}
-                fill="#ffffff"
-                filter="url(#moonGlow)"
-                opacity="0.9"
-              />
-            )}
-            <circle
-              cx={m.mx}
-              cy={m.my}
-              r={m.lit ? 3 : 2}
-              fill={m.lit ? '#ffffff' : '#94a3b8'}
-              opacity={m.lit ? 1 : 0.5}
-            />
-          </g>
-        ))}
+        {moonsBehind.map((m, mIdx) => {
+          const mColor = m.color || p.color
+          return (
+            <g key={m.id || mIdx}>
+              {m.lit ? (
+                <>
+                  {/* Pulsing colored ring */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={3}
+                    fill="none"
+                    stroke={mColor}
+                    strokeWidth="0.8"
+                    opacity="0.8"
+                  >
+                    <animate
+                      attributeName="r"
+                      values="3;8;3"
+                      dur={`${2 + (mIdx % 3)}s`}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.8;0.1;0.8"
+                      dur={`${2 + (mIdx % 3)}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                  {/* Radiant colored aura in exact planet color */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={3.8}
+                    fill={mColor}
+                    filter={`url(#moonGlow-${p.id})`}
+                    opacity="1"
+                  />
+                  {/* Bright center core */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={2.2}
+                    fill="#ffffff"
+                    stroke={mColor}
+                    strokeWidth="0.6"
+                  />
+                </>
+              ) : (
+                <circle
+                  cx={m.mx}
+                  cy={m.my}
+                  r={2}
+                  fill="#334155"
+                  stroke="#475569"
+                  strokeWidth="0.5"
+                  opacity="0.4"
+                />
+              )}
+            </g>
+          )
+        })}
 
         {/* Planet Saturn Ring (Back part) */}
         {p.hasRing && (
@@ -227,27 +270,68 @@ export default function EarthOrbitSystem({
         )}
 
         {/* Moons in front of planet */}
-        {moonsInFront.map((m, mIdx) => (
-          <g key={m.id || mIdx}>
-            {m.lit && (
-              <circle
-                cx={m.mx}
-                cy={m.my}
-                r={4.5}
-                fill="#ffffff"
-                filter="url(#moonGlow)"
-                opacity="0.95"
-              />
-            )}
-            <circle
-              cx={m.mx}
-              cy={m.my}
-              r={m.lit ? 3.2 : 2.2}
-              fill={m.lit ? '#ffffff' : '#cbd5e1'}
-              opacity={m.lit ? 1 : 0.65}
-            />
-          </g>
-        ))}
+        {moonsInFront.map((m, mIdx) => {
+          const mColor = m.color || p.color
+          return (
+            <g key={m.id || mIdx}>
+              {m.lit ? (
+                <>
+                  {/* Pulsing colored ring */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={3.5}
+                    fill="none"
+                    stroke={mColor}
+                    strokeWidth="1"
+                    opacity="0.85"
+                  >
+                    <animate
+                      attributeName="r"
+                      values="3.5;9;3.5"
+                      dur={`${2 + (mIdx % 3)}s`}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.9;0.1;0.9"
+                      dur={`${2 + (mIdx % 3)}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                  {/* Radiant colored aura in exact planet color */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={4.5}
+                    fill={mColor}
+                    filter={`url(#moonGlow-${p.id})`}
+                    opacity="1"
+                  />
+                  {/* Bright center core */}
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={2.6}
+                    fill="#ffffff"
+                    stroke={mColor}
+                    strokeWidth="0.8"
+                  />
+                </>
+              ) : (
+                <circle
+                  cx={m.mx}
+                  cy={m.my}
+                  r={2.3}
+                  fill="#475569"
+                  stroke="#64748b"
+                  strokeWidth="0.5"
+                  opacity="0.5"
+                />
+              )}
+            </g>
+          )
+        })}
 
         {/* Planet Tag Label */}
         <g transform={`translate(${p.px}, ${p.py + p.size / 2 + 13})`} className="pointer-events-none">
@@ -285,7 +369,7 @@ export default function EarthOrbitSystem({
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
           <span className="font-medium text-white/80">Hệ thống quỹ đạo thời gian thực</span>
-          <span className="text-white/40 hidden sm:inline">· Click vào hành tinh để vào dự án</span>
+          <span className="text-white/40 hidden sm:inline">· Tinh cầu sáng theo màu dự án khi hoàn thành</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -333,6 +417,21 @@ export default function EarthOrbitSystem({
               </radialGradient>
             ))}
 
+            {/* Exact-Color Glow Filters for Each Planet's Moons */}
+            {planets.map((p) => (
+              <filter
+                key={`moonGlow-${p.id}`}
+                id={`moonGlow-${p.id}`}
+                x="-150%"
+                y="-150%"
+                width="400%"
+                height="400%"
+              >
+                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor={p.color} floodOpacity="0.95" />
+                <feDropShadow dx="0" dy="0" stdDeviation="6.5" floodColor={p.color} floodOpacity="0.75" />
+              </filter>
+            ))}
+
             {/* Earth Center Radial Gradient */}
             <radialGradient id="earthGrad" cx="35%" cy="30%" r="70%">
               <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.95" />
@@ -357,18 +456,9 @@ export default function EarthOrbitSystem({
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-
-            {/* Moon Lit Glow Filter */}
-            <filter id="moonGlow" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
-          {/* 1. VISIBLE CONTINUOUS ORBITAL TRACKS (Concentric Ellipses matching Solar System diagram) */}
+          {/* 1. VISIBLE CONTINUOUS ORBITAL TRACKS */}
           {calculatedPlanets.map((p, idx) => (
             <ellipse
               key={`orbit-${p.id || idx}`}

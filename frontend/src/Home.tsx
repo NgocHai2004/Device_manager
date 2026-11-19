@@ -91,15 +91,24 @@ export default function Home() {
 
     const moons =
       features.length > 0
-        ? features.map((f) => ({
-            id: f.id,
-            name: `${f.code} ${f.name}`,
-            lit: f.status === 'Pass',
-          }))
+        ? features.map((f) => {
+            const isDone =
+              f.status === 'Pass' ||
+              f.done ||
+              (f.sub_total > 0 && f.sub_done === f.sub_total) ||
+              (f.sub_done > 0 && f.status !== 'Fail')
+            return {
+              id: f.id,
+              name: `${f.code} ${f.name}`,
+              lit: Boolean(isDone),
+              color: p.color || theme.color,
+            }
+          })
         : (det?.modules ?? []).map((m) => ({
             id: m.id,
             name: `${m.code} ${m.name}`,
-            lit: m.done > 0 && m.done === m.total,
+            lit: (m.done > 0 && m.done === m.total) || m.done > 0,
+            color: p.color || theme.color,
           }))
 
     return {
