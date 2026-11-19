@@ -229,15 +229,26 @@ export default function EarthOrbitSystem({
                   />
                 </>
               ) : (
-                <circle
-                  cx={m.mx}
-                  cy={m.my}
-                  r={2.8}
-                  fill="#334155"
-                  stroke="#475569"
-                  strokeWidth="0.8"
-                  opacity="0.45"
-                />
+                /* Uncompleted moon: retains matching planet color in dormant, unlit state */
+                <g>
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={2.8}
+                    fill={mColor}
+                    fillOpacity="0.35"
+                    stroke={mColor}
+                    strokeWidth="1.2"
+                    strokeOpacity="0.8"
+                  />
+                  <circle
+                    cx={m.mx - 0.7}
+                    cy={m.my - 0.7}
+                    r={1}
+                    fill="#ffffff"
+                    fillOpacity="0.3"
+                  />
+                </g>
               )}
             </g>
           )
@@ -336,15 +347,26 @@ export default function EarthOrbitSystem({
                   />
                 </>
               ) : (
-                <circle
-                  cx={m.mx}
-                  cy={m.my}
-                  r={3.2}
-                  fill="#475569"
-                  stroke="#64748b"
-                  strokeWidth="0.8"
-                  opacity="0.6"
-                />
+                /* Uncompleted moon in front: retains matching planet color in dormant, unlit state */
+                <g>
+                  <circle
+                    cx={m.mx}
+                    cy={m.my}
+                    r={3.4}
+                    fill={mColor}
+                    fillOpacity="0.4"
+                    stroke={mColor}
+                    strokeWidth="1.3"
+                    strokeOpacity="0.85"
+                  />
+                  <circle
+                    cx={m.mx - 0.8}
+                    cy={m.my - 0.8}
+                    r={1.2}
+                    fill="#ffffff"
+                    fillOpacity="0.35"
+                  />
+                </g>
               )}
             </g>
           )

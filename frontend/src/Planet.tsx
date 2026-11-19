@@ -57,11 +57,11 @@ export default function Planet({ color, size = 96, moons = [] }: PlanetProps) {
                 margin: -(size * 0.14) / 2,
                 background: m.lit
                   ? `radial-gradient(circle at 30% 30%, #ffffff, ${mColor} 70%)`
-                  : 'radial-gradient(circle at 30% 30%, #8b8799, #3a3745)',
+                  : `radial-gradient(circle at 30% 30%, ${mColor}88, ${mColor}33 60%, #05030e)`,
                 boxShadow: m.lit
                   ? `0 0 10px #ffffff, 0 0 18px ${mColor}, 0 0 28px ${mColor}`
-                  : 'inset -2px -2px 4px #00000066',
-                opacity: m.lit ? 1 : 0.45,
+                  : `inset -2px -2px 4px #00000088, 0 0 5px ${mColor}55`,
+                opacity: m.lit ? 1 : 0.65,
               } as CSSProperties
             }
           />
