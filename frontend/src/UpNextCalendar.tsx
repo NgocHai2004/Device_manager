@@ -1,4 +1,3 @@
-
 export interface CalendarEvent {
   id: string | number
   time: string
@@ -15,28 +14,18 @@ interface UpNextCalendarProps {
 const DEFAULT_EVENTS: CalendarEvent[] = [
   {
     id: 1,
-    time: 'Tomorrow · 9:30 AM',
-    title: 'Standup',
+    time: 'Ngày mai · 9:30 AM',
+    title: 'Họp giao ban QC',
     avatars: [
       { initials: 'MK', bg: '#ec4899' },
       { initials: 'DF', bg: '#8b5cf6' },
-      { initials: 'SF', bg: '#06b6d4' },
       { initials: 'AB', bg: '#f59e0b' },
     ],
   },
   {
     id: 2,
-    time: 'Tomorrow · 11:30 AM',
-    title: '1:1 Mara / Dev',
-    avatars: [
-      { initials: 'MK', bg: '#ec4899' },
-      { initials: 'DK', bg: '#10b981' },
-    ],
-  },
-  {
-    id: 3,
-    time: 'Friday · 2:00 PM',
-    title: 'QC Forensic Demo v4.2',
+    time: 'Thứ 6 · 2:00 PM',
+    title: 'Demo Mobi Forensic v4.2',
     avatars: [
       { initials: 'QC', bg: '#3b82f6' },
       { initials: 'AB', bg: '#f59e0b' },
@@ -49,14 +38,14 @@ export default function UpNextCalendar({
   onAddEvent,
 }: UpNextCalendarProps) {
   return (
-    <div className="glass p-6 flex flex-col justify-between h-full">
+    <div className="glass p-3.5 sm:p-4 flex flex-col justify-between h-full overflow-hidden">
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-xl font-bold text-white tracking-tight">Up next</h2>
-          <span className="text-xs text-white/50">📅 Lịch biểu</span>
+        <div className="flex items-center justify-between mb-0.5">
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">Up next</h2>
+          <span className="text-xs text-white/50">📅 Lịch</span>
         </div>
-        <div className="flex items-center justify-between text-xs text-white/50 mb-4">
-          <span>{events.length} on your calendar</span>
+        <div className="flex items-center justify-between text-xs text-white/50 mb-2">
+          <span>{events.length} sự kiện sắp tới</span>
           {onAddEvent && (
             <button
               onClick={onAddEvent}
@@ -68,26 +57,26 @@ export default function UpNextCalendar({
         </div>
 
         {/* Calendar Events List */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {events.map((ev) => (
             <div
               key={ev.id}
-              className="p-3 rounded-2xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 hover:border-white/20 transition-all"
+              className="p-2 rounded-xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 hover:border-white/20 transition-all"
             >
-              <div className="text-[11px] text-amber-300/80 font-medium mb-1">
+              <div className="text-[10px] text-amber-300/80 font-medium mb-0.5">
                 {ev.time}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-white truncate mr-2">
+                <span className="text-xs font-semibold text-white truncate mr-2">
                   {ev.title}
                 </span>
 
                 {/* Avatar Initial Clusters */}
-                <div className="flex -space-x-1.5 shrink-0">
+                <div className="flex -space-x-1 shrink-0">
                   {ev.avatars.map((av, aIdx) => (
                     <span
                       key={aIdx}
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold text-white shadow-md border border-slate-900"
+                      className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[9px] font-bold text-white shadow-md border border-slate-900"
                       style={{ backgroundColor: av.bg }}
                       title={av.initials}
                     >
@@ -101,9 +90,9 @@ export default function UpNextCalendar({
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-white/40 flex items-center justify-between">
-        <span>Google Calendar / Outlook</span>
-        <span className="text-cyan-400">Đã đồng bộ</span>
+      <div className="mt-2 pt-2 border-t border-white/5 text-[10px] text-white/40 flex items-center justify-between">
+        <span>Lịch kiểm thử</span>
+        <span className="text-cyan-400">Đồng bộ</span>
       </div>
     </div>
   )

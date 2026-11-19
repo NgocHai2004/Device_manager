@@ -83,7 +83,7 @@ export default function Home() {
   const doneFeatures = projects?.reduce((s, p) => s + p.done, 0) ?? 0
   const overallPercent = totalFeatures > 0 ? Math.round((doneFeatures / totalFeatures) * 100) : 0
 
-  // Build EpicPlanets with real features as orbiting moons
+  // Build EpicPlanets strictly centered on their orbital rings
   const epicPlanets: EpicPlanet[] = (projects ?? []).map((p, idx) => {
     const theme = PALETTE[idx % PALETTE.length]
     const det = details[p.id]
@@ -108,10 +108,10 @@ export default function Home() {
       code: `P${p.id}`,
       color: p.color || theme.color,
       glowColor: theme.glow,
-      radius: 145 + idx * 46,
-      speed: 24 + idx * 7,
-      size: 38 + (idx % 3) * 4,
-      startAngle: (idx * 360) / Math.max(projects?.length ?? 1, 1) + 20,
+      radius: 135 + idx * 56,
+      speed: 26 + idx * 8,
+      size: 34 + (idx % 3) * 4,
+      startAngle: (idx * 360) / Math.max(projects?.length ?? 1, 1) + 25,
       hasRing: idx % 2 === 1,
       moons,
     }
@@ -164,13 +164,12 @@ export default function Home() {
       setToastMessage({
         text:
           newStatus === 'Pass'
-            ? `${target.code} đã hoàn thành — một tinh cầu mới vừa bừng sáng trên "${target.epicName}"`
-            : `${target.code} đã đưa về trạng thái chờ kiểm thử`,
+            ? `${target.code} đã hoàn thành — tinh cầu sáng rực trên "${target.epicName}"`
+            : `${target.code} đã đặt lại về trạng thái chờ kiểm thử`,
         issueId: target.id,
         prevStatus: target.done ? 'Pass' : 'Pending',
       })
 
-      // Auto dismiss toast after 5s
       setTimeout(() => {
         setToastMessage((cur) => (cur?.issueId === target.id ? null : cur))
       }, 5000)
@@ -206,12 +205,28 @@ export default function Home() {
     }))
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-6 max-w-[1920px] mx-auto space-y-6">
-      {/* Top Search & Actions Bar (TRANSOM Style) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Search Input */}
-        <div className="relative w-full md:w-96">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+    <div className="h-full w-full flex flex-col justify-between overflow-hidden p-3 lg:p-4 gap-2.5 max-w-[1920px] mx-auto select-none">
+      {/* COMPACT SINGLE-ROW TOP BAR (No vertical overflow) */}
+      <header className="shrink-0 h-11 flex items-center justify-between gap-3 px-1">
+        {/* Left Title & Status */}
+        <div className="flex items-center gap-3 shrink-0 min-w-0">
+          <h1 className="text-xl lg:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            <span>QC Forensic</span>
+            <span className="text-amber-400">🌟</span>
+          </h1>
+          <div className="hidden xl:flex items-center gap-1.5 text-xs text-white/60 pl-3 border-l border-white/10">
+            <span className="text-white font-semibold">{projects?.length ?? 0} dự án</span>
+            <span>·</span>
+            <span className="text-amber-300 font-semibold">
+              {doneFeatures}/{totalFeatures}
+            </span>
+            <span>tính năng ({overallPercent}%)</span>
+          </div>
+        </div>
+
+        {/* Center Search Input */}
+        <div className="relative flex-1 max-w-md hidden md:block">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">
             🔍
           </span>
           <input
@@ -219,231 +234,193 @@ export default function Home() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm kiếm tính năng, mã task, dự án... [Ctrl+K]"
-            className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-14 py-2 text-sm text-white placeholder-white/40 focus:border-cyan-400/50 focus:bg-white/10 transition"
+            className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-12 py-1.5 text-xs text-white placeholder-white/40 focus:border-cyan-400/50 focus:bg-white/10 transition"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-white/10 border border-white/20 text-white/50 px-1.5 py-0.5 rounded font-mono">
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] bg-white/10 border border-white/20 text-white/50 px-1 py-0.5 rounded font-mono">
             ⌘K
           </kbd>
         </div>
 
-        {/* Top Right Controls */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/70">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span>25:00</span>
+        {/* Right Action Controls */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* View mode toggle */}
+          <div className="flex items-center gap-1 p-0.5 rounded-xl bg-white/5 border border-white/10">
+            <button
+              onClick={() => setViewMode('orbit')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1 ${
+                viewMode === 'orbit'
+                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30 shadow'
+                  : 'text-white/60 hover:text-white'
+              }`}
+              title="Quỹ đạo vũ trụ thời gian thực"
+            >
+              <span>🪐</span>
+              <span className="hidden sm:inline">Quỹ đạo</span>
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1 ${
+                viewMode === 'grid'
+                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30 shadow'
+                  : 'text-white/60 hover:text-white'
+              }`}
+              title="Xem danh sách lưới thẻ"
+            >
+              <span>▦</span>
+              <span className="hidden sm:inline">Lưới thẻ</span>
+            </button>
           </div>
 
           <button
             onClick={() => setShowForm(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-semibold text-xs shadow-[0_0_15px_rgba(245,158,11,0.3)] transition flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-bold text-xs shadow-[0_0_12px_rgba(245,158,11,0.3)] transition flex items-center gap-1"
           >
             <span>+ Tạo dự án</span>
           </button>
 
           <div className="flex items-center gap-2 pl-2 border-l border-white/10">
-            <button
-              onClick={() => alert('Chế độ ánh sáng không gian: Đã tối ưu cho màn hình đêm')}
-              className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-xs text-white/70"
-              title="Chế độ giao diện"
-            >
-              🔆
-            </button>
-            <div className="relative">
-              <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xs text-white/70">
-                🔔
-              </span>
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-pink-500 text-[10px] font-bold text-white flex items-center justify-center">
-                3
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-black font-bold text-xs flex items-center justify-center shadow-md">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-black font-extrabold text-xs flex items-center justify-center shadow-md">
               QC
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Greeting Header & Subtitle */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-1">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-            Chào buổi tối, <span className="text-amber-400">QC Forensic</span> 🌟
-          </h1>
-          <p className="mt-1.5 text-white/60 text-sm md:text-base">
-            {projects ? (
-              <>
-                Hệ thống gồm <span className="text-white font-medium">{projects.length} dự án</span>{' '}
-                ·{' '}
-                <span className="text-amber-300 font-semibold">
-                  {doneFeatures}/{totalFeatures}
-                </span>{' '}
-                tính năng đã hoàn thành ({overallPercent}%) · Phiên bản 4.2
-              </>
-            ) : (
-              'Đang nạp dữ liệu vũ trụ…'
-            )}
-          </p>
-        </div>
-
-        {/* View mode switcher */}
-        <div className="flex items-center gap-2 p-1 rounded-xl bg-white/5 border border-white/10 self-start sm:self-auto">
-          <button
-            onClick={() => setViewMode('orbit')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-              viewMode === 'orbit'
-                ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30 shadow'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            <span>🪐</span>
-            <span>Quỹ đạo Vũ trụ</span>
-          </button>
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-              viewMode === 'grid'
-                ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30 shadow'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            <span>▦</span>
-            <span>Lưới thẻ dự án</span>
-          </button>
-        </div>
       </header>
 
-      {/* TOP ROW: Cosmic Orbit / Grid Cards + Focus Timer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Left Column: Earth Orbit System (~65% width) */}
-        <div className="lg:col-span-8 glass p-0 overflow-hidden flex flex-col justify-between">
-          {viewMode === 'orbit' ? (
-            <EarthOrbitSystem
-              planets={epicPlanets}
-              onNewProject={() => setShowForm(true)}
-              onOpenProject={(pid) => (window.location.hash = `#/p/${pid}`)}
-            />
-          ) : (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-white">Danh sách thẻ dự án</h2>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="text-xs text-amber-400 hover:underline"
-                >
-                  + Thêm mới
-                </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[440px] overflow-y-auto pr-1">
-                {projects?.map((p) => {
-                  const det = details[p.id]
-                  const moons =
-                    det?.modules.map((m) => ({ lit: m.done > 0 && m.done === m.total })) ?? []
-                  return (
-                    <div
-                      key={p.id}
-                      className="glass-panel p-4 flex flex-col items-center gap-3 cursor-pointer hover:bg-white/10 transition"
-                      onClick={() => (window.location.hash = `#/p/${p.id}`)}
-                    >
-                      <Planet color={p.color} moons={moons} />
-                      <div className="text-center w-full">
-                        <h3 className="text-base font-semibold truncate">{p.name}</h3>
-                        <p className="text-white/50 text-xs mt-1 line-clamp-1">
-                          {p.description || 'Không có mô tả'}
-                        </p>
-                      </div>
-                      <div className="w-full">
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-white/60">
-                            {p.done}/{p.total} tính năng
-                          </span>
-                          <span className="font-semibold text-amber-300">{p.percent}%</span>
-                        </div>
-                        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all"
-                            style={{
-                              width: `${p.percent}%`,
-                              background: 'linear-gradient(90deg,#f59e0b,#fbbf24)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          del(p)
-                        }}
-                        className="text-[11px] text-white/40 hover:text-red-400 transition"
+      {/* MAIN TWO-ROW GRID (Fits exactly in remaining 100vh height, NO SCROLL) */}
+      <div className="flex-1 min-h-0 flex flex-col gap-2.5 overflow-hidden">
+        {/* ROW 1: Orbit System (~60% height) + Focus Timer */}
+        <div className="flex-[1.4] min-h-0 grid grid-cols-12 gap-2.5 overflow-hidden items-stretch">
+          {/* Left Column: Earth Orbit System (8 cols) */}
+          <div className="col-span-12 lg:col-span-8 glass p-0 overflow-hidden flex flex-col justify-between h-full">
+            {viewMode === 'orbit' ? (
+              <EarthOrbitSystem
+                planets={epicPlanets}
+                onNewProject={() => setShowForm(true)}
+                onOpenProject={(pid) => (window.location.hash = `#/p/${pid}`)}
+              />
+            ) : (
+              <div className="p-4 flex flex-col h-full overflow-hidden">
+                <div className="flex items-center justify-between mb-3 shrink-0">
+                  <h2 className="text-sm font-bold text-white">Danh sách thẻ dự án</h2>
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="text-xs text-amber-400 hover:underline"
+                  >
+                    + Thêm mới
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 min-h-0 overflow-y-auto pr-1">
+                  {projects?.map((p) => {
+                    const det = details[p.id]
+                    const moons =
+                      det?.modules.map((m) => ({ lit: m.done > 0 && m.done === m.total })) ?? []
+                    return (
+                      <div
+                        key={p.id}
+                        className="glass-panel p-3 flex flex-col items-center gap-2 cursor-pointer hover:bg-white/10 transition"
+                        onClick={() => (window.location.hash = `#/p/${p.id}`)}
                       >
-                        🗑 Xóa dự án
-                      </button>
-                    </div>
-                  )
-                })}
+                        <Planet color={p.color} moons={moons} />
+                        <div className="text-center w-full">
+                          <h3 className="text-sm font-semibold truncate">{p.name}</h3>
+                          <p className="text-white/50 text-[11px] mt-0.5 line-clamp-1">
+                            {p.description || 'Không có mô tả'}
+                          </p>
+                        </div>
+                        <div className="w-full">
+                          <div className="flex justify-between text-[11px] mb-1">
+                            <span className="text-white/60">
+                              {p.done}/{p.total} tính năng
+                            </span>
+                            <span className="font-semibold text-amber-300">{p.percent}%</span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{
+                                width: `${p.percent}%`,
+                                background: 'linear-gradient(90deg,#f59e0b,#fbbf24)',
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            del(p)
+                          }}
+                          className="text-[10px] text-white/40 hover:text-red-400 transition"
+                        >
+                          🗑 Xóa dự án
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Right Column: Focus Timer Card (~35% width) */}
-        <div className="lg:col-span-4">
-          <FocusTimer
-            tasks={pendingTasks}
-            onFocusComplete={(taskId) => {
-              const task = allIssues.find((i) => i.id === taskId)
-              if (task && !task.done) {
-                if (confirm(`Phiên tập trung hoàn tất! Đánh dấu ${task.code} là Pass?`)) {
-                  handleToggleIssue(taskId)
+          {/* Right Column: Focus Timer Card (4 cols) */}
+          <div className="col-span-12 lg:col-span-4 h-full overflow-hidden">
+            <FocusTimer
+              tasks={pendingTasks}
+              onFocusComplete={(taskId) => {
+                const task = allIssues.find((i) => i.id === taskId)
+                if (task && !task.done) {
+                  if (confirm(`Phiên tập trung hoàn tất! Đánh dấu ${task.code} là Pass?`)) {
+                    handleToggleIssue(taskId)
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          </div>
+        </div>
+
+        {/* ROW 2: Issues List + Sprint Metrics + Up Next (~40% height) */}
+        <div className="flex-1 min-h-0 grid grid-cols-12 gap-2.5 overflow-hidden items-stretch">
+          {/* Issues List Card (5 cols) */}
+          <div className="col-span-12 lg:col-span-5 h-full overflow-hidden">
+            <IssuesList
+              issues={filteredIssues}
+              onToggleIssue={handleToggleIssue}
+              onAddNewIssue={() => {
+                if (projects && projects.length > 0) {
+                  window.location.hash = `#/p/${projects[0].id}`
+                }
+              }}
+            />
+          </div>
+
+          {/* Sprint Metrics Card (4 cols) */}
+          <div className="col-span-12 lg:col-span-4 h-full overflow-hidden">
+            <SprintMetrics
+              sprintNumber={24}
+              percent={overallPercent}
+              pointsLeft={totalFeatures - doneFeatures}
+              totalPoints={totalFeatures}
+              daysLeft={4}
+              goalText="Kiểm thử và hoàn thiện toàn bộ các module kết nối thiết bị và trích xuất dữ liệu Mobi Forensic v4.2."
+            />
+          </div>
+
+          {/* Up Next Calendar Card (3 cols) */}
+          <div className="col-span-12 lg:col-span-3 h-full overflow-hidden">
+            <UpNextCalendar />
+          </div>
         </div>
       </div>
 
-      {/* BOTTOM ROW: Your Issues + Sprint Metrics + Up Next Calendar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Issues List Card (5 columns) */}
-        <div id="issues-section" className="lg:col-span-5">
-          <IssuesList
-            issues={filteredIssues}
-            onToggleIssue={handleToggleIssue}
-            onAddNewIssue={() => {
-              if (projects && projects.length > 0) {
-                window.location.hash = `#/p/${projects[0].id}`
-              }
-            }}
-          />
-        </div>
-
-        {/* Sprint Metrics Card (4 columns) */}
-        <div id="metrics-section" className="lg:col-span-4">
-          <SprintMetrics
-            sprintNumber={24}
-            percent={overallPercent}
-            pointsLeft={totalFeatures - doneFeatures}
-            totalPoints={totalFeatures}
-            daysLeft={4}
-            goalText="Kiểm thử và hoàn thiện toàn bộ các module kết nối thiết bị và trích xuất dữ liệu Mobi Forensic v4.2."
-          />
-        </div>
-
-        {/* Up Next Calendar Card (3 columns) */}
-        <div id="calendar-section" className="lg:col-span-3">
-          <UpNextCalendar />
-        </div>
-      </div>
-
-      {/* Floating Bottom Toast Notification (Matching TRANSOM style) */}
+      {/* Floating Bottom Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-full bg-slate-900/95 border border-cyan-400/40 text-white text-xs shadow-2xl backdrop-blur-xl animate-bounce">
-          <span className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-xs">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2 rounded-full bg-slate-900/95 border border-cyan-400/40 text-white text-xs shadow-2xl backdrop-blur-xl animate-bounce">
+          <span className="w-4 h-4 rounded-full bg-emerald-500 text-black flex items-center justify-center font-bold text-[10px]">
             ✓
           </span>
-          <span className="font-medium">{toastMessage.text}</span>
+          <span className="font-medium text-xs">{toastMessage.text}</span>
           <button
             onClick={handleUndo}
-            className="ml-2 px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold transition"
+            className="ml-2 px-2 py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold transition text-[11px]"
           >
             Hoàn tác
           </button>
@@ -457,23 +434,23 @@ export default function Home() {
           onClick={() => setShowForm(false)}
         >
           <div
-            className="glass p-6 w-full max-w-md border border-white/20 shadow-2xl"
+            className="glass p-5 w-full max-w-md border border-white/20 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span>🪐</span>
                 <span>Tạo hành tinh dự án mới</span>
               </h2>
               <button
                 onClick={() => setShowForm(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center"
+                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center text-xs"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={addProject} className="flex flex-col gap-4">
+            <form onSubmit={addProject} className="flex flex-col gap-3">
               <div>
                 <label className="text-xs text-white/60 mb-1 block">Tên dự án *</label>
                 <input
@@ -482,7 +459,7 @@ export default function Home() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ví dụ: Mobi Forensic Mobile"
                   required
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/40 focus:border-amber-400"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/40 focus:border-amber-400"
                 />
               </div>
 
@@ -491,9 +468,9 @@ export default function Home() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Mô tả phạm vi kiểm thử hoặc tính năng"
+                  placeholder="Mô tả phạm vi kiểm thử"
                   rows={2}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/40 resize-none focus:border-amber-400"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/40 resize-none focus:border-amber-400"
                 />
               </div>
 
@@ -504,7 +481,7 @@ export default function Home() {
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer bg-transparent border-0"
+                    className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
                   />
                   <div className="flex gap-2">
                     {['#38bdf8', '#ec4899', '#f59e0b', '#a855f7', '#10b981'].map((c) => (
@@ -512,7 +489,7 @@ export default function Home() {
                         key={c}
                         type="button"
                         onClick={() => setColor(c)}
-                        className="w-6 h-6 rounded-full border border-white/20 transition hover:scale-110"
+                        className="w-5 h-5 rounded-full border border-white/20 transition hover:scale-110"
                         style={{ backgroundColor: c }}
                       />
                     ))}
@@ -520,17 +497,17 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2.5 pt-1">
                 <button
                   type="submit"
-                  className="flex-1 rounded-lg py-2 font-semibold text-sm text-black transition bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-md"
+                  className="flex-1 rounded-lg py-1.5 font-bold text-xs text-black transition bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-md"
                 >
                   Tạo dự án
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 rounded-lg bg-white/10 text-sm hover:bg-white/20 text-white"
+                  className="px-3 rounded-lg bg-white/10 text-xs hover:bg-white/20 text-white"
                 >
                   Hủy
                 </button>
