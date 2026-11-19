@@ -66,14 +66,18 @@ export default function EarthOrbitSystem({
 
   // SVG Universe Dimensions
   const viewBoxW = 960
-  const viewBoxH = 500
+  const viewBoxH = 520
   const cx = 480
-  const cy = 250
+  const cy = 255
+
+  // Display at most 4-6 projects as requested, spaced out generously
+  const displayPlanets = planets.slice(0, 6)
 
   // Calculate coordinates for all planets strictly along their orbits
-  const calculatedPlanets = planets.map((p, idx) => {
-    const rx = 135 + idx * 56
-    const ry = 70 + idx * 28
+  const calculatedPlanets = displayPlanets.map((p, idx) => {
+    // Generously spaced orbits for 4-6 large planets
+    const rx = 160 + idx * 58
+    const ry = 82 + idx * 29
 
     const angleDeg = p.startAngle + (time * 360) / p.speed
     const rad = (angleDeg * Math.PI) / 180
@@ -86,17 +90,17 @@ export default function EarthOrbitSystem({
     const isSelected = selectedPlanetId === p.id
     const isHovered = hoveredPlanet?.id === p.id
 
-    // Moon parameters
+    // Moon parameters scaled for bigger planets
     const moonLayers = [
-      { mRx: p.size * 0.9, mRy: p.size * 0.45, speedFactor: 1 },
-      { mRx: p.size * 1.35, mRy: p.size * 0.65, speedFactor: 0.7 },
+      { mRx: p.size * 0.95, mRy: p.size * 0.48, speedFactor: 1 },
+      { mRx: p.size * 1.4, mRy: p.size * 0.7, speedFactor: 0.72 },
     ]
 
     const calculatedMoons = p.moons.map((m, mIdx) => {
       const layer = moonLayers[mIdx % 2]
       const moonAngle =
         (mIdx * (360 / Math.max(p.moons.length, 1))) +
-        (time * 360 * layer.speedFactor) / (6 + (mIdx % 3) * 2)
+        (time * 360 * layer.speedFactor) / (7 + (mIdx % 3) * 2)
       const moonRad = (moonAngle * Math.PI) / 180
 
       // Moon center coordinates: MATHEMATICALLY 100% ON THE MOON'S MINI-ELLIPSE
@@ -156,9 +160,9 @@ export default function EarthOrbitSystem({
             ry={layer.mRy}
             fill="none"
             stroke={p.color}
-            strokeOpacity={p.isHovered ? 0.45 : 0.22}
-            strokeDasharray="2 3"
-            strokeWidth="0.8"
+            strokeOpacity={p.isHovered ? 0.5 : 0.25}
+            strokeDasharray="3 4"
+            strokeWidth="1"
           />
         ))}
 
@@ -173,22 +177,22 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={3}
+                    r={4}
                     fill="none"
                     stroke={mColor}
-                    strokeWidth="0.8"
+                    strokeWidth="1"
                     opacity="0.8"
                   >
                     <animate
                       attributeName="r"
-                      values="3;8;3"
-                      dur={`${2 + (mIdx % 3)}s`}
+                      values="4;10;4"
+                      dur={`${2.2 + (mIdx % 3)}s`}
                       repeatCount="indefinite"
                     />
                     <animate
                       attributeName="opacity"
                       values="0.8;0.1;0.8"
-                      dur={`${2 + (mIdx % 3)}s`}
+                      dur={`${2.2 + (mIdx % 3)}s`}
                       repeatCount="indefinite"
                     />
                   </circle>
@@ -196,7 +200,7 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={3.8}
+                    r={5}
                     fill={mColor}
                     filter={`url(#moonGlow-${p.id})`}
                     opacity="1"
@@ -205,21 +209,21 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={2.2}
+                    r={3.2}
                     fill="#ffffff"
                     stroke={mColor}
-                    strokeWidth="0.6"
+                    strokeWidth="1"
                   />
                 </>
               ) : (
                 <circle
                   cx={m.mx}
                   cy={m.my}
-                  r={2}
+                  r={2.8}
                   fill="#334155"
                   stroke="#475569"
-                  strokeWidth="0.5"
-                  opacity="0.4"
+                  strokeWidth="0.8"
+                  opacity="0.45"
                 />
               )}
             </g>
@@ -236,12 +240,12 @@ export default function EarthOrbitSystem({
             transform={`rotate(-25 ${p.px} ${p.py})`}
             fill="none"
             stroke={p.color}
-            strokeOpacity="0.4"
-            strokeWidth="2.5"
+            strokeOpacity="0.45"
+            strokeWidth="3.5"
           />
         )}
 
-        {/* Planet Sphere */}
+        {/* Big Planet Sphere */}
         <circle
           cx={p.px}
           cy={p.py}
@@ -249,8 +253,8 @@ export default function EarthOrbitSystem({
           fill={`url(#planetGrad-${p.id})`}
           filter={p.isSelected || p.isHovered ? 'url(#planetGlowActive)' : 'url(#planetGlow)'}
           stroke={p.color}
-          strokeWidth={p.isSelected ? 2 : 1}
-          strokeOpacity={p.isSelected ? 0.9 : 0.4}
+          strokeWidth={p.isSelected ? 2.5 : 1.5}
+          strokeOpacity={p.isSelected ? 0.95 : 0.55}
         />
 
         {/* Planet Saturn Ring (Front part) */}
@@ -263,9 +267,9 @@ export default function EarthOrbitSystem({
             transform={`rotate(-25 ${p.px} ${p.py})`}
             fill="none"
             stroke={p.color}
-            strokeOpacity="0.85"
-            strokeWidth="1.8"
-            strokeDasharray="18 45"
+            strokeOpacity="0.9"
+            strokeWidth="2.5"
+            strokeDasharray="25 65"
           />
         )}
 
@@ -280,22 +284,22 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={3.5}
+                    r={5}
                     fill="none"
                     stroke={mColor}
-                    strokeWidth="1"
-                    opacity="0.85"
+                    strokeWidth="1.2"
+                    opacity="0.9"
                   >
                     <animate
                       attributeName="r"
-                      values="3.5;9;3.5"
-                      dur={`${2 + (mIdx % 3)}s`}
+                      values="4.5;12;4.5"
+                      dur={`${2.2 + (mIdx % 3)}s`}
                       repeatCount="indefinite"
                     />
                     <animate
                       attributeName="opacity"
                       values="0.9;0.1;0.9"
-                      dur={`${2 + (mIdx % 3)}s`}
+                      dur={`${2.2 + (mIdx % 3)}s`}
                       repeatCount="indefinite"
                     />
                   </circle>
@@ -303,7 +307,7 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={4.5}
+                    r={6.5}
                     fill={mColor}
                     filter={`url(#moonGlow-${p.id})`}
                     opacity="1"
@@ -312,21 +316,21 @@ export default function EarthOrbitSystem({
                   <circle
                     cx={m.mx}
                     cy={m.my}
-                    r={2.6}
+                    r={4}
                     fill="#ffffff"
                     stroke={mColor}
-                    strokeWidth="0.8"
+                    strokeWidth="1.2"
                   />
                 </>
               ) : (
                 <circle
                   cx={m.mx}
                   cy={m.my}
-                  r={2.3}
+                  r={3.2}
                   fill="#475569"
                   stroke="#64748b"
-                  strokeWidth="0.5"
-                  opacity="0.5"
+                  strokeWidth="0.8"
+                  opacity="0.6"
                 />
               )}
             </g>
@@ -334,25 +338,25 @@ export default function EarthOrbitSystem({
         })}
 
         {/* Planet Tag Label */}
-        <g transform={`translate(${p.px}, ${p.py + p.size / 2 + 13})`} className="pointer-events-none">
+        <g transform={`translate(${p.px}, ${p.py + p.size / 2 + 16})`} className="pointer-events-none">
           <rect
-            x={-p.name.length * 3.4 - 18}
-            y={-8}
-            width={p.name.length * 6.8 + 36}
-            height={16}
-            rx={8}
-            fill={p.isHovered || p.isSelected ? 'rgba(30, 27, 75, 0.9)' : 'rgba(10, 6, 25, 0.75)'}
+            x={-p.name.length * 3.6 - 20}
+            y={-9}
+            width={p.name.length * 7.2 + 40}
+            height={18}
+            rx={9}
+            fill={p.isHovered || p.isSelected ? 'rgba(30, 27, 75, 0.95)' : 'rgba(10, 6, 25, 0.8)'}
             stroke={p.color}
-            strokeWidth={p.isHovered ? 1.2 : 0.6}
-            strokeOpacity={p.isHovered ? 0.8 : 0.3}
+            strokeWidth={p.isHovered ? 1.4 : 0.8}
+            strokeOpacity={p.isHovered ? 0.9 : 0.4}
           />
           <text
             x={0}
-            y={3}
+            y={3.5}
             textAnchor="middle"
             fill="#ffffff"
-            fontSize="10"
-            fontWeight={p.isHovered ? 'bold' : 'normal'}
+            fontSize="10.5"
+            fontWeight={p.isHovered ? 'bold' : '500'}
             fontFamily="system-ui, sans-serif"
           >
             {p.name} ({litMoonsCount}/{p.moons.length})
@@ -367,9 +371,9 @@ export default function EarthOrbitSystem({
       {/* Top action / status inside the orbit box */}
       <div className="relative z-10 shrink-0 flex items-center justify-between px-4 pt-2.5 pb-1 text-xs text-white/50">
         <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span className="font-medium text-white/80">Hệ thống quỹ đạo thời gian thực</span>
-          <span className="text-white/40 hidden sm:inline">· Tinh cầu sáng theo màu dự án khi hoàn thành</span>
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+          <span className="font-semibold text-white/90 text-xs sm:text-sm">Hệ thống quỹ đạo thời gian thực</span>
+          <span className="text-white/40 hidden sm:inline">· Click vào hành tinh để vào dự án</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -393,7 +397,7 @@ export default function EarthOrbitSystem({
       {/* Orbit Canvas: 100% SVG coordinate system ensures EVERY body is on its track */}
       <div className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
         {/* Ambient cosmic nebula glow */}
-        <div className="absolute w-[500px] h-[280px] rounded-full bg-indigo-900/25 blur-3xl pointer-events-none" />
+        <div className="absolute w-[560px] h-[320px] rounded-full bg-indigo-900/30 blur-3xl pointer-events-none" />
 
         <svg
           viewBox={`0 0 ${viewBoxW} ${viewBoxH}`}
@@ -402,23 +406,23 @@ export default function EarthOrbitSystem({
         >
           <defs>
             {/* Planet Radial Gradients with 3D Spherical Lighting */}
-            {planets.map((p) => (
+            {displayPlanets.map((p) => (
               <radialGradient
                 key={`grad-${p.id}`}
                 id={`planetGrad-${p.id}`}
-                cx="32%"
-                cy="28%"
-                r="70%"
+                cx="30%"
+                cy="25%"
+                r="75%"
               >
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-                <stop offset="25%" stopColor={p.color} stopOpacity="0.9" />
-                <stop offset="70%" stopColor={p.color} stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#05030e" stopOpacity="0.95" />
+                <stop offset="28%" stopColor={p.color} stopOpacity="0.95" />
+                <stop offset="70%" stopColor={p.color} stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#04020a" stopOpacity="0.98" />
               </radialGradient>
             ))}
 
             {/* Exact-Color Glow Filters for Each Planet's Moons */}
-            {planets.map((p) => (
+            {displayPlanets.map((p) => (
               <filter
                 key={`moonGlow-${p.id}`}
                 id={`moonGlow-${p.id}`}
@@ -427,22 +431,22 @@ export default function EarthOrbitSystem({
                 width="400%"
                 height="400%"
               >
-                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor={p.color} floodOpacity="0.95" />
-                <feDropShadow dx="0" dy="0" stdDeviation="6.5" floodColor={p.color} floodOpacity="0.75" />
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={p.color} floodOpacity="0.95" />
+                <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor={p.color} floodOpacity="0.75" />
               </filter>
             ))}
 
             {/* Earth Center Radial Gradient */}
-            <radialGradient id="earthGrad" cx="35%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.95" />
-              <stop offset="25%" stopColor="#0284c7" stopOpacity="0.9" />
-              <stop offset="60%" stopColor="#047857" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#020617" stopOpacity="0.95" />
+            <radialGradient id="earthGrad" cx="32%" cy="28%" r="72%">
+              <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.98" />
+              <stop offset="25%" stopColor="#0284c7" stopOpacity="0.95" />
+              <stop offset="60%" stopColor="#047857" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#020617" stopOpacity="0.98" />
             </radialGradient>
 
             {/* Glow Filter for Planets */}
             <filter id="planetGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -450,7 +454,7 @@ export default function EarthOrbitSystem({
             </filter>
 
             <filter id="planetGlowActive" x="-80%" y="-80%" width="260%" height="260%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -468,72 +472,73 @@ export default function EarthOrbitSystem({
               ry={p.ry}
               fill="none"
               stroke={p.color}
-              strokeOpacity={p.isHovered ? 0.6 : 0.25}
-              strokeWidth={p.isHovered ? 1.6 : 1.1}
-              strokeDasharray={p.isHovered ? 'none' : '4 5'}
+              strokeOpacity={p.isHovered ? 0.65 : 0.28}
+              strokeWidth={p.isHovered ? 1.8 : 1.2}
+              strokeDasharray={p.isHovered ? 'none' : '4 6'}
             />
           ))}
 
           {/* 2. Planets passing behind Earth */}
           {planetsBehind.map(renderPlanet)}
 
-          {/* 3. Central Earth Globe */}
+          {/* 3. Central Earth Globe (Bigger & Majestic) */}
           <g
             className="cursor-pointer group"
             onClick={() => onSelectPlanet && onSelectPlanet(null)}
           >
             {/* Atmosphere Halo Ring */}
-            <circle cx={cx} cy={cy} r={38} fill="none" stroke="#38bdf8" strokeOpacity="0.3" strokeWidth="2">
-              <animate attributeName="r" values="36;42;36" dur="3s" repeatCount="indefinite" />
-              <animate attributeName="stroke-opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite" />
+            <circle cx={cx} cy={cy} r={62} fill="none" stroke="#38bdf8" strokeOpacity="0.35" strokeWidth="2.5">
+              <animate attributeName="r" values="58;68;58" dur="3.5s" repeatCount="indefinite" />
+              <animate attributeName="stroke-opacity" values="0.45;0.12;0.45" dur="3.5s" repeatCount="indefinite" />
             </circle>
 
             {/* Earth Core Body */}
             <circle
               cx={cx}
               cy={cy}
-              r={26}
+              r={44}
               fill="url(#earthGrad)"
               stroke="#38bdf8"
-              strokeWidth="1.5"
-              strokeOpacity="0.7"
+              strokeWidth="2.5"
+              strokeOpacity="0.8"
               filter="url(#planetGlowActive)"
             />
 
             {/* Continent Swirl Simulation */}
-            <circle cx={cx - 6} cy={cy - 4} r={12} fill="#10b981" opacity="0.35" />
-            <circle cx={cx + 8} cy={cy + 6} r={9} fill="#34d399" opacity="0.25" />
+            <circle cx={cx - 10} cy={cy - 8} r={20} fill="#10b981" opacity="0.4" />
+            <circle cx={cx + 14} cy={cy + 10} r={16} fill="#34d399" opacity="0.3" />
+            <circle cx={cx - 6} cy={cy + 16} r={12} fill="#059669" opacity="0.35" />
 
             {/* Center Earth Icon */}
             <text
               x={cx}
-              y={cy + 5}
+              y={cy + 9}
               textAnchor="middle"
-              fontSize="16"
-              className="pointer-events-none select-none"
+              fontSize="28"
+              className="pointer-events-none select-none drop-shadow-[0_2px_12px_rgba(255,255,255,0.7)]"
             >
               🌍
             </text>
 
             {/* Central Earth Badge */}
-            <g transform={`translate(${cx}, ${cy + 38})`}>
+            <g transform={`translate(${cx}, ${cy + 58})`}>
               <rect
-                x={-52}
-                y={-8}
-                width={104}
-                height={16}
-                rx={8}
-                fill="rgba(15, 23, 42, 0.85)"
+                x={-58}
+                y={-9}
+                width={116}
+                height={18}
+                rx={9}
+                fill="rgba(15, 23, 42, 0.9)"
                 stroke="#38bdf8"
-                strokeWidth="0.8"
-                strokeOpacity="0.4"
+                strokeWidth="1"
+                strokeOpacity="0.5"
               />
               <text
                 x={0}
-                y={3.5}
+                y={4}
                 textAnchor="middle"
                 fill="#38bdf8"
-                fontSize="9"
+                fontSize="10"
                 fontWeight="bold"
                 fontFamily="system-ui, sans-serif"
               >
@@ -555,7 +560,7 @@ export default function EarthOrbitSystem({
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span
-                  className="w-3 h-3 rounded-full shadow-sm"
+                  className="w-3.5 h-3.5 rounded-full shadow-sm"
                   style={{ backgroundColor: hoveredPlanet.color }}
                 />
                 <span className="font-semibold text-xs text-white">{hoveredPlanet.name}</span>
@@ -599,7 +604,7 @@ export default function EarthOrbitSystem({
       {/* Bottom Legend Chips */}
       <div className="relative z-10 shrink-0 flex flex-wrap items-center justify-between gap-2 py-1.5 px-4 border-t border-white/5 bg-black/30">
         <div className="flex flex-wrap items-center gap-2">
-          {planets.map((p) => {
+          {displayPlanets.map((p) => {
             const litCount = p.moons.filter((m) => m.lit).length
             const isSelected = selectedPlanetId === p.id
             return (
@@ -614,13 +619,13 @@ export default function EarthOrbitSystem({
                 title="Nhấp để vào dự án này"
               >
                 <span
-                  className="w-2 h-2 rounded-full transition-transform"
+                  className="w-2.5 h-2.5 rounded-full transition-transform"
                   style={{
                     backgroundColor: p.color,
-                    boxShadow: `0 0 6px ${p.color}`,
+                    boxShadow: `0 0 8px ${p.color}`,
                   }}
                 />
-                <span className="text-[11px]">{p.name}</span>
+                <span className="text-[11px] font-medium">{p.name}</span>
                 <span className="text-white/40 text-[10px]">
                   {litCount}/{p.moons.length}
                 </span>
