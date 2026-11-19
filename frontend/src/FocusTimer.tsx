@@ -28,7 +28,7 @@ export default function FocusTimer({
   const [focusedTodayMin, setFocusedTodayMin] = useState<number>(0)
   const [sessionsCount, setSessionsCount] = useState<number>(0)
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const timerRef = useRef<number | null>(null)
 
   // Keep currentTaskId in sync if task list changes and no id selected
   useEffect(() => {

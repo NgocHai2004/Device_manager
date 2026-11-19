@@ -120,7 +120,7 @@ export default function ProjectPage({ id }: Props) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-8 max-w-[1920px] mx-auto">
       <a href="#/" className="text-white/60 hover:text-white text-sm mb-6 inline-block">
         ← Trang chủ
       </a>

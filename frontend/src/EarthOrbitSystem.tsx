@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 export interface EpicPlanet {
   id: string | number
@@ -18,16 +18,20 @@ export interface EpicPlanet {
   }[]
 }
 
-interface EarthOrbitSystemProps {
+export interface EarthOrbitSystemProps {
   planets: EpicPlanet[]
-  selectedPlanetId: string | number | null
-  onSelectPlanet: (planetId: string | number | null) => void
+  selectedPlanetId?: string | number | null
+  onSelectPlanet?: (planetId: string | number | null) => void
+  onOpenProject?: (planetId: string | number) => void
+  onNewProject?: () => void
 }
 
 export default function EarthOrbitSystem({
   planets,
-  selectedPlanetId,
+  selectedPlanetId = null,
   onSelectPlanet,
+  onOpenProject,
+  onNewProject,
 }: EarthOrbitSystemProps) {
   const [isRotating, setIsRotating] = useState(true)
   const [hoveredPlanet, setHoveredPlanet] = useState<EpicPlanet | null>(null)
@@ -51,13 +55,22 @@ export default function EarthOrbitSystem({
     return () => cancelAnimationFrame(animId)
   }, [isRotating])
 
+  const handlePlanetClick = (planetId: string | number) => {
+    if (onOpenProject) {
+      onOpenProject(planetId)
+    } else {
+      window.location.hash = `#/p/${planetId}`
+    }
+  }
+
   return (
-    <div className="relative w-full h-[440px] md:h-[480px] flex flex-col justify-between overflow-hidden select-none">
+    <div className="relative w-full h-[460px] md:h-[500px] flex flex-col justify-between overflow-hidden select-none">
       {/* Top action / status inside the orbit box */}
-      <div className="relative z-10 flex items-center justify-between px-2 pt-1 text-xs text-white/50">
+      <div className="relative z-10 flex items-center justify-between px-4 pt-3 text-xs text-white/50">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span>Hệ thống quỹ đạo thời gian thực</span>
+          <span className="font-medium text-white/80">Hệ thống quỹ đạo thời gian thực</span>
+          <span className="text-white/40 hidden sm:inline">· Nhấp vào hành tinh để vào dự án</span>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -67,7 +80,7 @@ export default function EarthOrbitSystem({
           >
             {isRotating ? '⏸ Tạm dừng' : '▶ Quay'}
           </button>
-          {selectedPlanetId && (
+          {selectedPlanetId && onSelectPlanet && (
             <button
               onClick={() => onSelectPlanet(null)}
               className="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30 hover:bg-amber-400/30 transition text-xs"
@@ -81,45 +94,56 @@ export default function EarthOrbitSystem({
       {/* Orbit Canvas / 3D Space Center */}
       <div className="relative flex-1 flex items-center justify-center">
         {/* Ambient cosmic backdrop glow */}
-        <div className="absolute w-[450px] h-[320px] rounded-full bg-indigo-900/20 blur-3xl pointer-events-none" />
+        <div className="absolute w-[500px] h-[340px] rounded-full bg-indigo-900/20 blur-3xl pointer-events-none" />
 
         {/* Orbital Elliptical Rings around Central Earth */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="-300 -180 600 360"
+          viewBox="-350 -200 700 400"
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            <linearGradient id="ringGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#818cf8" stopOpacity="0.05" />
-            </linearGradient>
-            <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f472b6" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#c084fc" stopOpacity="0.05" />
-            </linearGradient>
-            <linearGradient id="ringGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.05" />
-            </linearGradient>
-            <linearGradient id="ringGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.05" />
-            </linearGradient>
+            {planets.map((p, idx) => (
+              <linearGradient
+                key={`grad-${p.id || idx}`}
+                id={`ringGrad-${p.id || idx}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stopColor={p.color} stopOpacity="0.4" />
+                <stop offset="50%" stopColor={p.glowColor || p.color} stopOpacity="0.15" />
+                <stop offset="100%" stopColor={p.color} stopOpacity="0.05" />
+              </linearGradient>
+            ))}
           </defs>
 
           {/* Elliptical paths */}
-          <ellipse cx="0" cy="0" rx="140" ry="75" fill="none" stroke="url(#ringGrad1)" strokeWidth="1.2" strokeDasharray="3 4" />
-          <ellipse cx="0" cy="0" rx="190" ry="105" fill="none" stroke="url(#ringGrad2)" strokeWidth="1" strokeDasharray="4 6" />
-          <ellipse cx="0" cy="0" rx="245" ry="135" fill="none" stroke="url(#ringGrad3)" strokeWidth="1.2" strokeDasharray="3 5" />
-          <ellipse cx="0" cy="0" rx="285" ry="155" fill="none" stroke="url(#ringGrad4)" strokeWidth="0.8" strokeDasharray="5 7" />
+          {planets.map((p, idx) => {
+            const rx = 145 + idx * 46
+            const ry = 75 + idx * 24
+            return (
+              <ellipse
+                key={`ellipse-${p.id || idx}`}
+                cx="0"
+                cy="0"
+                rx={rx}
+                ry={ry}
+                fill="none"
+                stroke={`url(#ringGrad-${p.id || idx})`}
+                strokeWidth="1.2"
+                strokeDasharray="4 6"
+              />
+            )
+          })}
         </svg>
 
         {/* Central Earth Globe */}
         <div
           className="relative z-20 flex flex-col items-center group cursor-pointer"
-          onClick={() => onSelectPlanet(null)}
-          title="Trái Đất Trung Tâm (Tổng thể hệ thống)"
+          onClick={() => onSelectPlanet && onSelectPlanet(null)}
+          title="Trái Đất Trung Tâm · QC Workspace Hub"
         >
           {/* Outer atmosphere halo */}
           <div className="earth-atmosphere w-24 h-24" />
@@ -149,8 +173,8 @@ export default function EarthOrbitSystem({
           const rad = (angleDeg * Math.PI) / 180
 
           // Radii match elliptical paths
-          const rx = 140 + idx * 48
-          const ry = 75 + idx * 28
+          const rx = 145 + idx * 46
+          const ry = 75 + idx * 24
 
           const x = Math.cos(rad) * rx
           const y = Math.sin(rad) * ry
@@ -168,11 +192,11 @@ export default function EarthOrbitSystem({
               }}
               onMouseEnter={() => setHoveredPlanet(p)}
               onMouseLeave={() => setHoveredPlanet(null)}
-              onClick={() => onSelectPlanet(isSelected ? null : p.id)}
+              onClick={() => handlePlanetClick(p.id)}
             >
               {/* Planetary System Container */}
               <div
-                className="relative flex items-center justify-center"
+                className="relative flex items-center justify-center group"
                 style={{ width: p.size * 2.8, height: p.size * 2.8 }}
               >
                 {/* Selection halo */}
@@ -186,7 +210,7 @@ export default function EarthOrbitSystem({
                   />
                 )}
 
-                {/* Planet Orbit Ring (like Saturn or tilted moon orbit) */}
+                {/* Planet Orbit Ring (Saturn ring / tilted orbit) */}
                 {p.hasRing ? (
                   <div
                     className="absolute rounded-full border pointer-events-none"
@@ -219,17 +243,19 @@ export default function EarthOrbitSystem({
                     boxShadow: isSelected || isHovered
                       ? `0 0 ${p.size * 0.8}px ${p.color}, 0 0 ${p.size * 1.5}px ${p.glowColor}, inset -4px -4px 10px rgba(0,0,0,0.8)`
                       : `0 0 ${p.size * 0.4}px ${p.color}, 0 0 ${p.size * 0.8}px ${p.glowColor}, inset -4px -4px 10px rgba(0,0,0,0.8)`,
-                    transform: isSelected || isHovered ? 'scale(1.15)' : 'scale(1)',
+                    transform: isSelected || isHovered ? 'scale(1.2)' : 'scale(1)',
                   }}
                 />
 
-                {/* Orbiting Moons / Subtask satellites */}
+                {/* Orbiting Moons / Feature satellites */}
                 {p.moons.map((m, mIdx) => {
-                  const moonAngle = (mIdx * (360 / p.moons.length)) + (time * 360) / (7 + mIdx * 2)
+                  const ringLayer = mIdx % 2 === 0 ? 1 : 1.3
+                  const moonAngle =
+                    (mIdx * (360 / p.moons.length)) + (time * 360) / (7 + (mIdx % 3) * 2)
                   const moonRad = (moonAngle * Math.PI) / 180
-                  const moonDist = p.size * 0.95
+                  const moonDist = p.size * (0.95 * ringLayer)
                   const mx = Math.cos(moonRad) * moonDist
-                  const my = Math.sin(moonRad) * (moonDist * 0.6) // slightly inclined
+                  const my = Math.sin(moonRad) * (moonDist * 0.6)
 
                   return (
                     <div
@@ -256,8 +282,8 @@ export default function EarthOrbitSystem({
                 {/* Floating Label / Tag */}
                 <div
                   className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all pointer-events-none ${
-                    isSelected
-                      ? 'bg-white/20 text-white border border-white/30 backdrop-blur-md scale-105'
+                    isSelected || isHovered
+                      ? 'bg-white/20 text-white border border-white/30 backdrop-blur-md scale-105 shadow-lg'
                       : 'bg-black/60 text-white/70 border border-white/10'
                   }`}
                 >
@@ -270,20 +296,28 @@ export default function EarthOrbitSystem({
 
         {/* Hovered Planet Tooltip HUD */}
         {hoveredPlanet && (
-          <div className="absolute top-3 left-4 z-30 p-3 rounded-xl bg-slate-900/90 border border-white/20 backdrop-blur-xl shadow-2xl pointer-events-none min-w-[200px] animate-fadeIn">
-            <div className="flex items-center gap-2">
-              <span
-                className="w-3 h-3 rounded-full shadow-sm"
-                style={{ backgroundColor: hoveredPlanet.color }}
-              />
-              <span className="font-semibold text-sm text-white">{hoveredPlanet.name}</span>
+          <div
+            onClick={() => handlePlanetClick(hoveredPlanet.id)}
+            className="absolute top-4 left-4 z-30 p-3.5 rounded-xl bg-slate-900/95 border border-white/20 backdrop-blur-xl shadow-2xl cursor-pointer min-w-[220px] transition-all hover:border-amber-400/50"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-3 h-3 rounded-full shadow-sm"
+                  style={{ backgroundColor: hoveredPlanet.color }}
+                />
+                <span className="font-semibold text-sm text-white">{hoveredPlanet.name}</span>
+              </div>
+              <span className="text-[10px] text-white/40">#{hoveredPlanet.code}</span>
             </div>
+            
             <div className="mt-2 text-xs text-white/70 flex justify-between">
-              <span>Tiến độ vệ tinh:</span>
+              <span>Tiến độ tính năng:</span>
               <span className="text-amber-300 font-bold">
-                {hoveredPlanet.moons.filter((m) => m.lit).length} / {hoveredPlanet.moons.length} hoàn thành
+                {hoveredPlanet.moons.filter((m) => m.lit).length} / {hoveredPlanet.moons.length} xong
               </span>
             </div>
+            
             <div className="mt-1.5 w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-300"
@@ -301,42 +335,55 @@ export default function EarthOrbitSystem({
                 }}
               />
             </div>
-            <div className="mt-2 text-[10px] text-white/50 italic">
-              Nhấp để lọc danh sách công việc của hành tinh này
+            
+            <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-amber-300 font-medium">
+              <span>Vào xem chi tiết dự án</span>
+              <span>→</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Legend Chips - Matching the Screenshot Style */}
-      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 pt-3 pb-1 border-t border-white/5">
-        {planets.map((p) => {
-          const litCount = p.moons.filter((m) => m.lit).length
-          const isSelected = selectedPlanetId === p.id
-          return (
-            <button
-              key={p.id}
-              onClick={() => onSelectPlanet(isSelected ? null : p.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                isSelected
-                  ? 'bg-white/20 text-white border border-white/40 shadow-lg scale-105'
-                  : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
-              }`}
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-full transition-transform"
-                style={{
-                  backgroundColor: p.color,
-                  boxShadow: `0 0 8px ${p.color}`,
-                }}
-              />
-              <span>{p.name}</span>
-              <span className="text-white/40 text-[11px]">
-                {litCount}/{p.moons.length}
-              </span>
-            </button>
-          )
-        })}
+      {/* Bottom Legend Chips - Matching TRANSOM style */}
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pt-3 pb-2 border-t border-white/5 px-4 bg-black/20">
+        <div className="flex flex-wrap items-center gap-2">
+          {planets.map((p) => {
+            const litCount = p.moons.filter((m) => m.lit).length
+            const isSelected = selectedPlanetId === p.id
+            return (
+              <button
+                key={p.id}
+                onClick={() => handlePlanetClick(p.id)}
+                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  isSelected
+                    ? 'bg-white/20 text-white border border-white/40 shadow-lg scale-105'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
+                }`}
+                title="Nhấp để vào dự án này"
+              >
+                <span
+                  className="w-2 h-2 rounded-full transition-transform"
+                  style={{
+                    backgroundColor: p.color,
+                    boxShadow: `0 0 8px ${p.color}`,
+                  }}
+                />
+                <span>{p.name}</span>
+                <span className="text-white/40 text-[11px]">
+                  {litCount}/{p.moons.length}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+        {onNewProject && (
+          <button
+            onClick={onNewProject}
+            className="text-xs text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1 transition"
+          >
+            <span>+ Tạo dự án mới</span>
+          </button>
+        )}
       </div>
     </div>
   )
