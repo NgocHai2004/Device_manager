@@ -152,18 +152,31 @@ export default function EarthOrbitSystem({
       >
         {/* Mini-orbit elliptical tracks around planet */}
         {p.moonLayers.map((layer, lIdx) => (
-          <ellipse
-            key={lIdx}
-            cx={p.px}
-            cy={p.py}
-            rx={layer.mRx}
-            ry={layer.mRy}
-            fill="none"
-            stroke={p.color}
-            strokeOpacity={p.isHovered ? 0.5 : 0.25}
-            strokeDasharray="3 4"
-            strokeWidth="1"
-          />
+          <g key={lIdx}>
+            {/* Subtle glow layer for moon orbit */}
+            <ellipse
+              cx={p.px}
+              cy={p.py}
+              rx={layer.mRx}
+              ry={layer.mRy}
+              fill="none"
+              stroke={p.color}
+              strokeOpacity="0.25"
+              strokeWidth="2.8"
+            />
+            {/* Crisp visible line for moon orbit */}
+            <ellipse
+              cx={p.px}
+              cy={p.py}
+              rx={layer.mRx}
+              ry={layer.mRy}
+              fill="none"
+              stroke={p.color}
+              strokeOpacity={p.isHovered ? 0.9 : 0.65}
+              strokeDasharray="4 4"
+              strokeWidth="1.4"
+            />
+          </g>
         ))}
 
         {/* Moons behind planet */}
@@ -462,20 +475,32 @@ export default function EarthOrbitSystem({
             </filter>
           </defs>
 
-          {/* 1. VISIBLE CONTINUOUS ORBITAL TRACKS */}
+          {/* 1. VISIBLE CONTINUOUS ORBITAL TRACKS (Crisp & High Contrast like Solar System diagram) */}
           {calculatedPlanets.map((p, idx) => (
-            <ellipse
-              key={`orbit-${p.id || idx}`}
-              cx={cx}
-              cy={cy}
-              rx={p.rx}
-              ry={p.ry}
-              fill="none"
-              stroke={p.color}
-              strokeOpacity={p.isHovered ? 0.65 : 0.28}
-              strokeWidth={p.isHovered ? 1.8 : 1.2}
-              strokeDasharray={p.isHovered ? 'none' : '4 6'}
-            />
+            <g key={`orbit-${p.id || idx}`}>
+              {/* Soft ambient cosmic glow along track */}
+              <ellipse
+                cx={cx}
+                cy={cy}
+                rx={p.rx}
+                ry={p.ry}
+                fill="none"
+                stroke={p.color}
+                strokeOpacity={p.isHovered ? 0.5 : 0.22}
+                strokeWidth={p.isHovered ? 6 : 4.5}
+              />
+              {/* Sharp, clearly visible main orbit line */}
+              <ellipse
+                cx={cx}
+                cy={cy}
+                rx={p.rx}
+                ry={p.ry}
+                fill="none"
+                stroke={p.color}
+                strokeOpacity={p.isHovered ? 1.0 : 0.75}
+                strokeWidth={p.isHovered ? 2.6 : 1.8}
+              />
+            </g>
           ))}
 
           {/* 2. Planets passing behind Earth */}
